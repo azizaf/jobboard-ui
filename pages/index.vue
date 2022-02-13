@@ -19,23 +19,24 @@
 		<div class="row">
 			<div class="col-12">
 				<b-jumbotron header="Jobboard" lead="Your ultimate job board" />
+				Page: {{ page }} / {{ pageCount }}  ( {{ pageJobs.length }} )
 			</div>
 		</div>
 
 		<div class="row">
-			<div class="col-12">
-				<div class="row">
-					<div class="col-12 col-md-6 mb-4" v-for="job in jobs" :key="job.link">
-						<b-card :title="job.title" :sub-title="job.pubDate" tag="job">
-							<!-- <b-card-text>
-								<p v-html="job.description+'...'"></p>
-							</b-card-text> -->
-							<b-button variant="primary" size="sm" :href="job.link">See job</b-button>
-							<b-button variant="outline-primary" size="sm" :href="job.link">Add to favorite</b-button>
-						</b-card>
-					</div>
-				</div>
+			<div class="col-12 col-md-6 mb-4" v-for="job in pageJobs" :key="job.link">
+				<b-card :title="job.title" :sub-title="job.pubDate" tag="job" class="shadow border-0">
+					<!-- <b-card-text>
+						<p v-html="job.description+'...'"></p>
+					</b-card-text> -->
+					<b-button variant="primary" size="sm" :href="job.link">See job</b-button>
+					<b-button variant="outline-primary" size="sm" :href="job.link">Add to favorite</b-button>
+				</b-card>
 			</div>
+		</div>
+
+		<div class="row">
+			<b-pagination-nav :link-gen="linkGen" :number-of-pages="pageCount" use-router></b-pagination-nav>
 		</div>
 	</div>
 </template>
@@ -46,7 +47,8 @@ export default {
 	name: 'IndexPage',
 	data() {
 		return {
-			jobs: []
+			jobs: [],
+			jobsPerPage: 10
 		}
 	},
 	async created() {
@@ -57,12 +59,27 @@ export default {
 		async getJobs() {
 			try {
 				let jobs = await this.$axios.$get("http://127.0.0.1:8000/jobs");
-				console.log(jobs)
 				return jobs
 			}
 			catch (e) {
 				throw e;
 			}
+		},
+		linkGen(pageNum) {
+			return pageNum === 1 ? '?' : `?page=${pageNum}`
+		}
+	},
+	computed: {
+		pageCount( ) {
+			return Math.ceil( this.jobs.length / this.jobsPerPage );
+		},
+		page() {
+			return this.$route.query?.page ? this.$route.query.page : 1;
+		},
+		pageJobs() {
+			let start = (this.page - 1) * this.jobsPerPage;
+			let end = this.page * this.jobsPerPage;
+			return this.jobs.slice(start, end);
 		}
 	}
 }
