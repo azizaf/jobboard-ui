@@ -18,8 +18,9 @@
 
 		<div class="row">
 			<div class="col-12">
-				<b-jumbotron header="Jobboard" lead="Your ultimate job board" />
-				Page: {{ page }} / {{ pageCount }}  ( {{ pageJobs.length }} )
+				<b-jumbotron header="Jobboard" lead="Your ultimate job board">
+					({{ jobs.length }}) Jobs offers for the last 30 days
+				</b-jumbotron>
 			</div>
 		</div>
 
@@ -35,7 +36,7 @@
 			</div>
 		</div>
 
-		<div class="row">
+		<div class="row content-center">
 			<b-pagination-nav :link-gen="linkGen" :number-of-pages="pageCount" use-router></b-pagination-nav>
 		</div>
 	</div>
@@ -48,7 +49,7 @@ export default {
 	data() {
 		return {
 			jobs: [],
-			jobsPerPage: 10
+			jobsPerPage: 15
 		}
 	},
 	async created() {
